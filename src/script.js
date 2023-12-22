@@ -206,8 +206,17 @@ const tick = () => {
 	const elapsedTime = clock.getElapsedTime();
 	const deltaTime = elapsedTime - oldElapsedTime;
 	oldElapsedTime = elapsedTime;
-
-	snow.position.y -= deltaTime * 0.1;
+	// snow.position.y -= deltaTime * 0.1;
+	const positions = snowGeometry.attributes.position.array;
+	for (let i = 0; i < snowCount; i += 3) {
+		positions[i + 1] -= deltaTime * 0.1;
+		if (positions[i + 1] < -5) {
+			positions[i + 1] = 5;
+			positions[i] = (Math.random() - 0.5) * 10;
+			positions[i + 2] = (Math.random() - 0.5) * 10;
+		}
+	}
+	snowGeometry.attributes.position.needsUpdate = true;
 
 	// Update physics world
 	world.step(1 / 60, deltaTime, 3);
