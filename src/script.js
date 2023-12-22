@@ -210,6 +210,7 @@ const tick = () => {
 	const positions = snowGeometry.attributes.position.array;
 	for (let i = 0; i < snowCount; i += 3) {
 		positions[i + 1] -= deltaTime * 0.1;
+		positions[i] += Math.sin(elapsedTime * 0.1 + i) * 0.2 * deltaTime;
 		if (positions[i + 1] < -5) {
 			positions[i + 1] = 5;
 			positions[i] = (Math.random() - 0.5) * 10;
