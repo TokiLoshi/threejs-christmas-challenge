@@ -88,6 +88,26 @@ sphere.position.y = 0.5;
 scene.add(sphere);
 
 /**
+ * Snow
+ */
+// Geometry
+const snowGeometry = new THREE.BufferGeometry();
+const snowCount = 5000;
+const positionArray = new Float32Array(snowCount * 3);
+for (let i = 0; i < snowCount * 3; i++) {
+	positionArray[i] = (Math.random() - 0.5) * 10;
+}
+snowGeometry.setAttribute(
+	"position",
+	new THREE.BufferAttribute(positionArray, 3)
+);
+const snowMaterial = new THREE.PointsMaterial({
+	size: 0.008,
+	sizeAttenuation: true,
+});
+const snow = new THREE.Points(snowGeometry, snowMaterial);
+scene.add(snow);
+/**
  * Floor
  */
 const floor = new THREE.Mesh(
@@ -186,6 +206,8 @@ const tick = () => {
 	const elapsedTime = clock.getElapsedTime();
 	const deltaTime = elapsedTime - oldElapsedTime;
 	oldElapsedTime = elapsedTime;
+
+	snow.position.y -= deltaTime * 0.1;
 
 	// Update physics world
 	world.step(1 / 60, deltaTime, 3);
