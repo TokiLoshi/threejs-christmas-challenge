@@ -92,7 +92,7 @@ scene.add(sphere);
  */
 // Geometry
 const snowGeometry = new THREE.BufferGeometry();
-const snowCount = 5000;
+const snowCount = 30000;
 const positionArray = new Float32Array(snowCount * 3);
 for (let i = 0; i < snowCount * 3; i++) {
 	positionArray[i] = (Math.random() - 0.5) * 10;
@@ -102,9 +102,12 @@ snowGeometry.setAttribute(
 	new THREE.BufferAttribute(positionArray, 3)
 );
 const snowMaterial = new THREE.PointsMaterial({
-	size: 0.008,
+	size: 0.003,
 	sizeAttenuation: true,
 });
+snowMaterial.depthWrite = false;
+snowMaterial.blending = THREE.AdditiveBlending;
+
 const snow = new THREE.Points(snowGeometry, snowMaterial);
 scene.add(snow);
 /**
