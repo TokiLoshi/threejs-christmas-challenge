@@ -9,14 +9,36 @@ import * as CANNON from "cannon-es";
 
 const gui = new GUI();
 const debugObject = {};
-debugObject.createSphere = () => {
-	createSphere(Math.random() * 0.5, {
+
+/** Debugging */
+
+// Add Presents
+debugObject.addPresents = () => {
+	console.log("Time to add some presents")
+	addPresents(
+		Math.random(),
+		Math.random(),
+		Math.random(), 
+		{
 		x: (Math.random() - 0.5) * 3,
 		y: 3,
 		z: (Math.random() - 0.5) * 3,
-	});
+	}
+	);
+	console.log("Adding Presents")
 };
-gui.add(debugObject, "createSphere");
+gui.add(debugObject, "addPresents");
+
+// Add Reset
+debugObject.cleanUp = () => {
+	for (const object of objectsToUpdate) {
+		// Remove body
+		world.removeBody(object.body)
+		scene.remove(object.mesh)
+	}
+	objectsToUpdate.splice(0, objectsToUpdate.length)
+}
+gui.add(debugObject, 'cleanUp')
 
 /**
  * Base
@@ -73,6 +95,53 @@ floorBody.addShape(floorShape);
 floorBody.quaternion.setFromAxisAngle(new CANNON.Vec3(-1, 0, 0), Math.PI * 0.5);
 world.addBody(floorBody);
 
+/**
+ * Utils
+ */
+const objectsToUpdate = []
+
+// Presents
+const presentColours = [0xff0000, 0x00ff00, 0x0000ff]
+const presentGeometry = new THREE.BoxGeometry(1, 1, 1)
+
+
+const addPresents = (width, height, depth, position) => {
+	const colorValue = presentColours[Math.floor(Math.random() * presentColours.length)]
+	const presentMaterial = new THREE.MeshStandardMaterial({
+		color: colorValue,
+		metalness: 0.3,
+		roughness: 0.4,
+		envMap: environmentMapTexture,
+		envMapIntensity: 0.5
+	})
+	// Three mesh
+	const mesh = new THREE.Mesh(presentGeometry, presentMaterial)
+	mesh.scale.set(width, height, depth)
+	mesh.castShadow = true
+	mesh.position.copy(position)
+	scene.add(mesh)
+
+	// Cannon.js body
+	const shape = new CANNON.Box(new CANNON.Vec3(width * 0.5, height * 0.5, depth * 0.5))
+	
+	const body = new CANNON.Body({
+		mass: 1,
+		position: new CANNON.Vec3(0, 3, 0),
+		shape: shape, 
+		material: defaultMaterial
+	})
+	body.position.copy(position)
+
+	world.addBody(body)
+	objectsToUpdate.push({mesh, body})
+}
+
+addPresents(1, 1.5, 2, {
+	x: 0, 
+	y: 3, 
+	z: 0
+})
+
 /**Test sphere */
 const sphere = new THREE.Mesh(
 	new THREE.SphereGeometry(1, 20, 20),
@@ -110,6 +179,10 @@ snowMaterial.blending = THREE.AdditiveBlending;
 
 const snow = new THREE.Points(snowGeometry, snowMaterial);
 scene.add(snow);
+
+
+
+
 /**
  * Floor
  */
@@ -195,9 +268,7 @@ renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.setSize(sizes.width, sizes.height);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
-/**
- * Utils
- */
+
 
 /**
  * Animate
@@ -209,6 +280,7 @@ const tick = () => {
 	const elapsedTime = clock.getElapsedTime();
 	const deltaTime = elapsedTime - oldElapsedTime;
 	oldElapsedTime = elapsedTime;
+
 	// snow.position.y -= deltaTime * 0.1;
 	const positions = snowGeometry.attributes.position.array;
 	for (let i = 0; i < snowCount; i += 3) {
@@ -224,6 +296,10 @@ const tick = () => {
 
 	// Update physics world
 	world.step(1 / 60, deltaTime, 3);
+	for (const object of objectsToUpdate){
+		object.mesh.position.copy(object.body.position)
+		object.mesh.quaternion.copy(object.body.quaternion)
+	}
 
 	// Upate controls
 	controls.update();
