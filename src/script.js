@@ -80,7 +80,8 @@ const textures = [
 	textureLoader.load("/textures/15.png"),
 ];
 const sphereTest = new THREE.TextureLoader().load("/textures/1.png");
-
+const snowTexture = textureLoader.load("/textures/16.png");
+const snowBumpMap = textureLoader.load("/textures/snowTexture/17.png.");
 /**
  * Pysics
  */
@@ -124,11 +125,12 @@ const addPresents = (width, height, depth, position) => {
 	console.log(`New texture to add: ${texture}`);
 	const presentMaterial = new THREE.MeshStandardMaterial({
 		map: texture,
+		bumpScale: 0.5,
 		// color: "#eeC31B",
-		metalness: 0.3,
+		// metalness: 0.3,
 		roughness: 0.4,
-		// envMap: environmentMapTexture,
-		// envMapIntensity: 0.5
+		envMap: environmentMapTexture,
+		envMapIntensity: 0.5,
 	});
 	// Three mesh
 	const mesh = new THREE.Mesh(presentGeometry, presentMaterial);
@@ -205,11 +207,11 @@ scene.add(snow);
 const floor = new THREE.Mesh(
 	new THREE.PlaneGeometry(10, 10),
 	new THREE.MeshStandardMaterial({
-		color: "#777777",
-		metalness: 0.3,
-		roughness: 0.4,
-		envMap: environmentMapTexture,
-		envMapIntensity: 0.5,
+		map: snowTexture,
+		// metalness: 0.3,
+		// roughness: 0.4,
+		// envMap: environmentMapTexture,
+		// envMapIntensity: 0.5,
 	})
 );
 floor.receiveShadow = true;
