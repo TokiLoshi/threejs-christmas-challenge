@@ -65,6 +65,26 @@ const environmentMapTexture = cubeTextureLoader.load([
 	"/textures/environmentMaps/0/nz.png",
 ]);
 
+const textures = [
+textureLoader.load("static/textures/2.png"), 
+textureLoader.load("static/textures/2.png"), 
+textureLoader.load("static/textures/3.png"), 
+textureLoader.load("static/textures/4.png"), 
+textureLoader.load("static/textures/5.png"), 
+textureLoader.load("static/textures/6.png"), 
+textureLoader.load("static/textures/7.png"), 
+textureLoader.load("static/textures/8.png"), 
+textureLoader.load("static/textures/9.png"),
+textureLoader.load("static/textures/10.png"), 
+textureLoader.load("static/textures/11.png"), 
+textureLoader.load("static/textures/12.png"), 
+textureLoader.load("static/textures/13.png"), 
+textureLoader.load("static/textures/14.png"), 
+textureLoader.load("static/textures/15.png")
+]
+const sphereTest = new THREE.TextureLoader().load("static/textures/1.png", function(texture) {
+	console.log('Texture loaded!', texture);})
+
 /**
  * Pysics
  */
@@ -101,18 +121,18 @@ world.addBody(floorBody);
 const objectsToUpdate = []
 
 // Presents
-const presentColours = [0xff0000, 0x00ff00, 0x0000ff]
 const presentGeometry = new THREE.BoxGeometry(1, 1, 1)
 
 
 const addPresents = (width, height, depth, position) => {
-	const colorValue = presentColours[Math.floor(Math.random() * presentColours.length)]
+	const texture = textures[Math.floor(Math.random() * textures.length)]
+	console.log(`New texture to add: ${texture}`)
 	const presentMaterial = new THREE.MeshStandardMaterial({
-		color: colorValue,
+		map: texture,
 		metalness: 0.3,
 		roughness: 0.4,
-		envMap: environmentMapTexture,
-		envMapIntensity: 0.5
+		// envMap: environmentMapTexture,
+		// envMapIntensity: 0.5
 	})
 	// Three mesh
 	const mesh = new THREE.Mesh(presentGeometry, presentMaterial)
@@ -146,10 +166,11 @@ addPresents(1, 1.5, 2, {
 const sphere = new THREE.Mesh(
 	new THREE.SphereGeometry(1, 20, 20),
 	new THREE.MeshStandardMaterial({
+		map: sphereTest,
 		metalness: 0.3,
 		roughness: 0.4,
-		envMap: environmentMapTexture,
-		envMapIntensity: 0.5,
+		// envMap: environmentMapTexture,
+		// envMapIntensity: 0.5,
 	})
 );
 sphere.castShadow = true;
@@ -267,6 +288,8 @@ renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.setSize(sizes.width, sizes.height);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.gammaOutput = true;
+renderer.gammaFactor = 2.2;
 
 
 
