@@ -14,18 +14,13 @@ const debugObject = {};
 
 // Add Presents
 debugObject.addPresents = () => {
-	console.log("Time to add some presents")
-	addPresents(
-		Math.random(),
-		Math.random(),
-		Math.random(), 
-		{
+	console.log("Time to add some presents");
+	addPresents(Math.random(), Math.random(), Math.random(), {
 		x: (Math.random() - 0.5) * 3,
 		y: 3,
 		z: (Math.random() - 0.5) * 3,
-	}
-	);
-	console.log("Adding Presents")
+	});
+	console.log("Adding Presents");
 };
 gui.add(debugObject, "addPresents");
 
@@ -33,12 +28,12 @@ gui.add(debugObject, "addPresents");
 debugObject.cleanUp = () => {
 	for (const object of objectsToUpdate) {
 		// Remove body
-		world.removeBody(object.body)
-		scene.remove(object.mesh)
+		world.removeBody(object.body);
+		scene.remove(object.mesh);
 	}
-	objectsToUpdate.splice(0, objectsToUpdate.length)
-}
-gui.add(debugObject, 'cleanUp')
+	objectsToUpdate.splice(0, objectsToUpdate.length);
+};
+gui.add(debugObject, "cleanUp");
 
 /**
  * Base
@@ -65,25 +60,26 @@ const environmentMapTexture = cubeTextureLoader.load([
 	"/textures/environmentMaps/0/nz.png",
 ]);
 
+const loading = [];
+
 const textures = [
-textureLoader.load("static/textures/2.png"), 
-textureLoader.load("static/textures/2.png"), 
-textureLoader.load("static/textures/3.png"), 
-textureLoader.load("static/textures/4.png"), 
-textureLoader.load("static/textures/5.png"), 
-textureLoader.load("static/textures/6.png"), 
-textureLoader.load("static/textures/7.png"), 
-textureLoader.load("static/textures/8.png"), 
-textureLoader.load("static/textures/9.png"),
-textureLoader.load("static/textures/10.png"), 
-textureLoader.load("static/textures/11.png"), 
-textureLoader.load("static/textures/12.png"), 
-textureLoader.load("static/textures/13.png"), 
-textureLoader.load("static/textures/14.png"), 
-textureLoader.load("static/textures/15.png")
-]
-const sphereTest = new THREE.TextureLoader().load("static/textures/1.png", function(texture) {
-	console.log('Texture loaded!', texture);})
+	textureLoader.load("/textures/2.png"),
+	textureLoader.load("/textures/2.png"),
+	textureLoader.load("/textures/3.png"),
+	textureLoader.load("/textures/4.png"),
+	textureLoader.load("/textures/5.png"),
+	textureLoader.load("/textures/6.png"),
+	textureLoader.load("/textures/7.png"),
+	textureLoader.load("/textures/8.png"),
+	textureLoader.load("/textures/9.png"),
+	textureLoader.load("/textures/10.png"),
+	textureLoader.load("/textures/11.png"),
+	textureLoader.load("/textures/12.png"),
+	textureLoader.load("/textures/13.png"),
+	textureLoader.load("/textures/14.png"),
+	textureLoader.load("/textures/15.png"),
+];
+const sphereTest = new THREE.TextureLoader().load("/textures/1.png");
 
 /**
  * Pysics
@@ -118,50 +114,51 @@ world.addBody(floorBody);
 /**
  * Utils
  */
-const objectsToUpdate = []
+const objectsToUpdate = [];
 
 // Presents
-const presentGeometry = new THREE.BoxGeometry(1, 1, 1)
-
+const presentGeometry = new THREE.BoxGeometry(1, 1, 1);
 
 const addPresents = (width, height, depth, position) => {
-	const texture = textures[Math.floor(Math.random() * textures.length)]
-	console.log(`New texture to add: ${texture}`)
+	const texture = textures[Math.floor(Math.random() * textures.length)];
+	console.log(`New texture to add: ${texture}`);
 	const presentMaterial = new THREE.MeshStandardMaterial({
-		// map: texture,
-		color: '#eeC31B',
+		map: texture,
+		// color: "#eeC31B",
 		metalness: 0.3,
 		roughness: 0.4,
 		// envMap: environmentMapTexture,
 		// envMapIntensity: 0.5
-	})
+	});
 	// Three mesh
-	const mesh = new THREE.Mesh(presentGeometry, presentMaterial)
-	mesh.scale.set(width, height, depth)
-	mesh.castShadow = true
-	mesh.position.copy(position)
-	scene.add(mesh)
+	const mesh = new THREE.Mesh(presentGeometry, presentMaterial);
+	mesh.scale.set(width, height, depth);
+	mesh.castShadow = true;
+	mesh.position.copy(position);
+	scene.add(mesh);
 
 	// Cannon.js body
-	const shape = new CANNON.Box(new CANNON.Vec3(width * 0.5, height * 0.5, depth * 0.5))
-	
+	const shape = new CANNON.Box(
+		new CANNON.Vec3(width * 0.5, height * 0.5, depth * 0.5)
+	);
+
 	const body = new CANNON.Body({
 		mass: 1,
-		position: new CANNON.Vec3(0, 3, 0),
-		shape: shape, 
-		material: defaultMaterial
-	})
-	body.position.copy(position)
+		position: new CANNON.Vec3(0.1, 3, 0.1),
+		shape: shape,
+		material: defaultMaterial,
+	});
+	body.position.copy(position);
 
-	world.addBody(body)
-	objectsToUpdate.push({mesh, body})
-}
+	world.addBody(body);
+	objectsToUpdate.push({ mesh, body });
+};
 
 addPresents(1, 1.5, 2, {
-	x: 0, 
-	y: 3, 
-	z: 0
-})
+	x: 0.1,
+	y: 3,
+	z: 0,
+});
 
 /**Test sphere */
 const sphere = new THREE.Mesh(
@@ -201,9 +198,6 @@ snowMaterial.blending = THREE.AdditiveBlending;
 
 const snow = new THREE.Points(snowGeometry, snowMaterial);
 scene.add(snow);
-
-
-
 
 /**
  * Floor
@@ -292,8 +286,6 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 renderer.gammaOutput = true;
 renderer.gammaFactor = 2.2;
 
-
-
 /**
  * Animate
  */
@@ -320,9 +312,9 @@ const tick = () => {
 
 	// Update physics world
 	world.step(1 / 60, deltaTime, 3);
-	for (const object of objectsToUpdate){
-		object.mesh.position.copy(object.body.position)
-		object.mesh.quaternion.copy(object.body.quaternion)
+	for (const object of objectsToUpdate) {
+		object.mesh.position.copy(object.body.position);
+		object.mesh.quaternion.copy(object.body.quaternion);
 	}
 
 	// Upate controls
