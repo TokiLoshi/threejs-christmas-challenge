@@ -128,7 +128,8 @@ const addPresents = (width, height, depth, position) => {
 	const texture = textures[Math.floor(Math.random() * textures.length)]
 	console.log(`New texture to add: ${texture}`)
 	const presentMaterial = new THREE.MeshStandardMaterial({
-		map: texture,
+		// map: texture,
+		color: '#eeC31B',
 		metalness: 0.3,
 		roughness: 0.4,
 		// envMap: environmentMapTexture,
