@@ -3,7 +3,7 @@ import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import GUI from "lil-gui";
 import * as CANNON from "cannon-es";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
-import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader.js";
+import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader";
 
 /**
  * Debug Controls
@@ -63,8 +63,6 @@ const environmentMapTexture = cubeTextureLoader.load([
 	"/textures/environmentMaps/0/nz.png",
 ]);
 
-const loading = [];
-
 const textures = [
 	textureLoader.load("/textures/2.png"),
 	textureLoader.load("/textures/2.png"),
@@ -82,15 +80,15 @@ const textures = [
 	textureLoader.load("/textures/14.png"),
 	textureLoader.load("/textures/15.png"),
 ];
-const sphereTest = new THREE.TextureLoader().load("/textures/1.png");
+// const sphereTest = new THREE.TextureLoader().load("/textures/1.png");
 const snowTexture = textureLoader.load("/textures/16.png");
-const snowBumpMap = textureLoader.load("/textures/snowTexture/17.png.");
 
 /**
  * Models
  */
 
 const loader = new GLTFLoader();
+let modelPosition = {};
 // const dracoLoader = new DRACOLoader();
 loader.load(
 	// "textures/snowman1.glb",
@@ -106,6 +104,8 @@ loader.load(
 			if (child instanceof THREE.Mesh) {
 				child.castShadow = true;
 				child.receiveShadow = true;
+				child.geometry.computeBoundingSphere();
+				console.log(child.name, child.geometry.boundingSphere);
 			}
 		});
 		scene.add(gltf.scene);
@@ -146,22 +146,81 @@ floorBody.addShape(floorShape);
 floorBody.quaternion.setFromAxisAngle(new CANNON.Vec3(-1, 0, 0), Math.PI * 0.5);
 world.addBody(floorBody);
 
-const bottomRadius = 1.5;
-const middleRadius = 0.75;
-const topRadius = 0.5;
-const posYBottom = 1;
-const posYMiddle = 2.5;
-const posYTop = 4;
+// const bottomRadius = 1.5;
+// const middleRadius = 1.4;
+// const topRadius = 1.5;
+// const posYBottom = 0;
+// const posYMiddle = 1.5;
+// const posYTop = 3;
 
+// const bottomSphereShape = new CANNON.Sphere(bottomRadius);
+// const middleSphereShape = new CANNON.Sphere(middleRadius);
+// const headSphere = new CANNON.Sphere(topRadius);
+
+// const snowmanBody = new CANNON.Body({ mass: 0, material: defaultMaterial });
+// snowmanBody.addShape(bottomSphereShape, new CANNON.Vec3(0, posYBottom, 0));
+// snowmanBody.addShape(middleSphereShape, new CANNON.Vec3(0, posYMiddle, 0));
+// snowmanBody.addShape(headSphere, new CANNON.Vec3(0, posYTop, 0));
+// const snowmanPosition = {
+// 	x: -1,
+// 	y: -0.3,
+// 	z: 0,
+// };
+// const bottomSphereShape = new CANNON.Sphere(1.9242523951366333); // Use the largest radius
+// const bottomSphereBody = new CANNON.Body({
+// 	mass: 0, // Make it static if the snowman won't move
+// 	position: new CANNON.Vec3(
+// 		snowmanPosition.x + 0.002950906753540039,
+// 		snowmanPosition.y - 0.5406738519668579,
+// 		snowmanPosition.z - 0.004921019077301025
+// 	),
+// });
+// world.addBody(bottomSphereBody);
+// world.addBody(snowmanBody);
+// The snowman's position in the world
+const snowmanPosition = new CANNON.Vec3(-1, -0.3, 0);
+
+// Create the spheres based on the provided diameters (divide by 2 for radius)
+const bottomRadius = 1.84 / 2;
+const middleRadius = 1.35 / 2;
+const topRadius = 1.15 / 2;
+
+// Create sphere shapes
 const bottomSphereShape = new CANNON.Sphere(bottomRadius);
 const middleSphereShape = new CANNON.Sphere(middleRadius);
-const headSphere = new CANNON.Sphere(topRadius);
+const topSphereShape = new CANNON.Sphere(topRadius);
 
-const snowmanBody = new CANNON.Body({ mass: 0, material: defaultMaterial });
-snowmanBody.addShape(bottomSphereShape, new CANNON.Vec3(0, posYBottom, 0));
-snowmanBody.addShape(middleSphereShape, new CANNON.Vec3(0, posYMiddle, 0));
-snowmanBody.addShape(headSphere, new CANNON.Vec3(0, posYTop, 0));
+// Create a compound body for the snowman
+const snowmanBody = new CANNON.Body({ mass: 0 }); // Static body
 
+// Calculate the position of the bottom sphere (touching the ground)
+const bottomSpherePos = new CANNON.Vec3(
+	snowmanPosition.x,
+	snowmanPosition.y + bottomRadius, // Bottom sphere is half above ground level
+	snowmanPosition.z
+);
+
+// Calculate the vertical offset for the middle and top spheres
+// Middle sphere is on top of the bottom sphere, so its position is bottom position + 2 radii
+const middleSpherePos = new CANNON.Vec3(
+	snowmanPosition.x,
+	bottomSpherePos.y + bottomRadius + middleRadius,
+	snowmanPosition.z
+);
+
+// Top sphere is on top of the middle sphere, similar calculation
+const topSpherePos = new CANNON.Vec3(
+	snowmanPosition.x,
+	middleSpherePos.y + middleRadius + topRadius,
+	snowmanPosition.z
+);
+
+// Add the shapes to the snowman body at the calculated positions
+snowmanBody.addShape(bottomSphereShape, bottomSpherePos);
+snowmanBody.addShape(middleSphereShape, middleSpherePos);
+snowmanBody.addShape(topSphereShape, topSpherePos);
+
+// Add the snowman body to the world
 world.addBody(snowmanBody);
 
 /**
