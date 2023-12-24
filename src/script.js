@@ -2,6 +2,8 @@ import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import GUI from "lil-gui";
 import * as CANNON from "cannon-es";
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
+import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader.js";
 
 /**
  * Debug Controls
@@ -82,6 +84,55 @@ const textures = [
 const sphereTest = new THREE.TextureLoader().load("/textures/1.png");
 const snowTexture = textureLoader.load("/textures/16.png");
 const snowBumpMap = textureLoader.load("/textures/snowTexture/17.png.");
+
+/**
+ * Models
+ */
+
+// const gltfLoader = new GLTFLoader();
+// gltfLoader.load("/textures/snowman1.glb", (gltf) => {
+// 	console.log("Trying to load snowman");
+// 	(gltf) => {
+// 		console.log("success");
+// 		scene.add(gltf.scene.children[0]);
+// 		console.log(gltf);
+// 	},
+// 		(progress) => {
+// 			console.log("progress");
+// 			console.log(progress);
+// 		},
+// 		(error) => {
+// 			console.log("error");
+// 			console.log(error);
+// 		};
+// });
+const loader = new GLTFLoader();
+// const dracoLoader = new DRACOLoader();
+loader.load(
+	// "textures/snowman1.glb",
+	"models/snowman1.glb",
+	(gltf) => {
+		// Loading open source poke ball model
+		// gltf.scene.scale.set(20, 20, 20);
+		console.log(gltf);
+		gltf.scene.position.y = -0.3;
+		gltf.scene.position.x = -1;
+		gltf.scene.rotation.y = Math.PI * 0.25;
+		gltf.scene.castShadow = true;
+		gltf.scene.traverse((child) => {
+			if (child instanceof THREE.Mesh) {
+				child.castShadow = true;
+				child.receiveShadow = true;
+			}
+		});
+		scene.add(gltf.scene);
+	},
+	undefined,
+	(error) => {
+		console.log(error);
+	}
+);
+
 /**
  * Pysics
  */
@@ -163,19 +214,19 @@ addPresents(1, 1.5, 2, {
 });
 
 /**Test sphere */
-const sphere = new THREE.Mesh(
-	new THREE.SphereGeometry(1, 20, 20),
-	new THREE.MeshStandardMaterial({
-		map: sphereTest,
-		metalness: 0.3,
-		roughness: 0.4,
-		// envMap: environmentMapTexture,
-		// envMapIntensity: 0.5,
-	})
-);
-sphere.castShadow = true;
-sphere.position.y = 0.5;
-scene.add(sphere);
+// const sphere = new THREE.Mesh(
+// 	new THREE.SphereGeometry(1, 20, 20),
+// 	new THREE.MeshStandardMaterial({
+// 		map: sphereTest,
+// 		metalness: 0.3,
+// 		roughness: 0.4,
+// 		// envMap: environmentMapTexture,
+// 		// envMapIntensity: 0.5,
+// 	})
+// );
+// sphere.castShadow = true;
+// sphere.position.y = 0.5;
+// scene.add(sphere);
 
 /**
  * Snow
