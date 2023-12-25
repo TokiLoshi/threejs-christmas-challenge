@@ -15,6 +15,8 @@ const debugObject = {};
 
 const addSound = new Audio("/sounds/adding.mp3");
 const cleanUpSound = new Audio("/sounds/cleanup.mp3");
+
+console.log(cleanUpSound);
 // Add Presents
 console.log(addSound);
 debugObject.addPresents = () => {
@@ -24,9 +26,10 @@ debugObject.addPresents = () => {
 		y: 3,
 		z: (Math.random() - 0.5) * 3,
 	});
+	console.log(addSound);
 	console.log("Adding Presents");
 	addSound.currentTime = 0;
-	addSound.play();
+	addSound.play().volume = 0.2;
 };
 gui.add(debugObject, "addPresents");
 
@@ -38,7 +41,8 @@ debugObject.cleanUp = () => {
 		scene.remove(object.mesh);
 	}
 	objectsToUpdate.splice(0, objectsToUpdate.length);
-	cleanUpSound.play();
+	console.log(cleanUpSound);
+	cleanUpSound.play().volume = 0.2;
 };
 gui.add(debugObject, "cleanUp");
 
@@ -59,14 +63,14 @@ scene.background = new THREE.Color("#22092C");
 /** Textures  */
 const textureLoader = new THREE.TextureLoader();
 const cubeTextureLoader = new THREE.CubeTextureLoader();
-const environmentMapTexture = cubeTextureLoader.load([
-	"/textures/environmentMaps/0/px.png",
-	"/textures/environmentMaps/0/nx.png",
-	"/textures/environmentMaps/0/py.png",
-	"/textures/environmentMaps/0/ny.png",
-	"/textures/environmentMaps/0/pz.png",
-	"/textures/environmentMaps/0/nz.png",
-]);
+// const environmentMapTexture = cubeTextureLoader.load([
+// 	"/textures/environmentMaps/0/px.png",
+// 	"/textures/environmentMaps/0/nx.png",
+// 	"/textures/environmentMaps/0/py.png",
+// 	"/textures/environmentMaps/0/ny.png",
+// 	"/textures/environmentMaps/0/pz.png",
+// 	"/textures/environmentMaps/0/nz.png",
+// ]);
 
 const textures = [
 	textureLoader.load("/textures/2.png"),
