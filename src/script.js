@@ -11,23 +11,21 @@ import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader";
 const gui = new GUI();
 const debugObject = {};
 
-/** Debugging */
+/**
+ * Debugging
+ */
 
 const addSound = new Audio("/sounds/adding.mp3");
 const cleanUpSound = new Audio("/sounds/cleanup.mp3");
 
-console.log(cleanUpSound);
 // Add Presents
 console.log(addSound);
 debugObject.addPresents = () => {
-	console.log("Time to add some presents");
 	addPresents(Math.random(), Math.random(), Math.random(), {
 		x: (Math.random() - 0.5) * 3,
 		y: 3,
 		z: (Math.random() - 0.5) * 3,
 	});
-	console.log(addSound);
-	console.log("Adding Presents");
 	addSound.currentTime = 0;
 	addSound.play().volume = 0.2;
 };
@@ -60,17 +58,11 @@ scene.background = new THREE.Color("#22092C");
  * Sounds
  */
 
-/** Textures  */
+/**
+ * Textures
+ * */
 const textureLoader = new THREE.TextureLoader();
 const cubeTextureLoader = new THREE.CubeTextureLoader();
-// const environmentMapTexture = cubeTextureLoader.load([
-// 	"/textures/environmentMaps/0/px.png",
-// 	"/textures/environmentMaps/0/nx.png",
-// 	"/textures/environmentMaps/0/py.png",
-// 	"/textures/environmentMaps/0/ny.png",
-// 	"/textures/environmentMaps/0/pz.png",
-// 	"/textures/environmentMaps/0/nz.png",
-// ]);
 
 const textures = [
 	textureLoader.load("/textures/2.png"),
@@ -89,22 +81,16 @@ const textures = [
 	textureLoader.load("/textures/14.png"),
 	textureLoader.load("/textures/15.png"),
 ];
-// const sphereTest = new THREE.TextureLoader().load("/textures/1.png");
 const snowTexture = textureLoader.load("/textures/16.png");
 
 /**
  * Models
  */
-
 const loader = new GLTFLoader();
 let modelPosition = {};
-// const dracoLoader = new DRACOLoader();
 loader.load(
-	// "textures/snowman1.glb",
 	"models/snowman1.glb",
 	(gltf) => {
-		// gltf.scene.scale.set(20, 20, 20);
-		// console.log(gltf);
 		gltf.scene.position.y = -0.3;
 		gltf.scene.position.x = -1;
 		gltf.scene.rotation.y = Math.PI * 0.45;
@@ -114,7 +100,6 @@ loader.load(
 				child.castShadow = true;
 				child.receiveShadow = true;
 				child.geometry.computeBoundingSphere();
-				// console.log(child.name, child.geometry.boundingSphere);
 			}
 		});
 		scene.add(gltf.scene);
@@ -145,7 +130,6 @@ const defaultContactMaterial = new CANNON.ContactMaterial(
 		restitution: 0.3,
 	}
 );
-
 world.addContactMaterial(defaultContactMaterial);
 
 // Floor
@@ -161,8 +145,6 @@ world.addBody(floorBody);
 
 // Snowman
 const snowmanPosition = new CANNON.Vec3(-1, -0.3, 0);
-
-// Create the spheres based on the provided diameters (divide by 2 for radius)
 const bottomRadius = 1.84 / 2;
 const middleRadius = 1.35 / 2;
 const topRadius = 1.15 / 2;
@@ -173,29 +155,29 @@ const middleSphereShape = new CANNON.Sphere(middleRadius);
 const topSphereShape = new CANNON.Sphere(topRadius);
 const snowmanBody = new CANNON.Body({ mass: 0 });
 
-// Calculate the position of the bottom sphere (touching the ground)
-const bottomSpherePos = new CANNON.Vec3(
+// Calculate the position of the spheres
+const bottomSpherePosition = new CANNON.Vec3(
 	snowmanPosition.x,
 	snowmanPosition.y + bottomRadius,
 	snowmanPosition.z
 );
 
-const middleSpherePos = new CANNON.Vec3(
+const middleSpherePosition = new CANNON.Vec3(
 	snowmanPosition.x,
-	bottomSpherePos.y + bottomRadius + middleRadius,
+	bottomSpherePosition.y + bottomRadius + middleRadius,
 	snowmanPosition.z
 );
 
-const topSpherePos = new CANNON.Vec3(
+const topSpherePosition = new CANNON.Vec3(
 	snowmanPosition.x,
-	middleSpherePos.y + middleRadius + topRadius,
+	middleSpherePosition.y + middleRadius + topRadius,
 	snowmanPosition.z
 );
 
-// Add the shapes to the snowman body
-snowmanBody.addShape(bottomSphereShape, bottomSpherePos);
-snowmanBody.addShape(middleSphereShape, middleSpherePos);
-snowmanBody.addShape(topSphereShape, topSpherePos);
+// Add the spheres to the snowman body
+snowmanBody.addShape(bottomSphereShape, bottomSpherePosition);
+snowmanBody.addShape(middleSphereShape, middleSpherePosition);
+snowmanBody.addShape(topSphereShape, topSpherePosition);
 world.addBody(snowmanBody);
 
 /**
@@ -205,19 +187,13 @@ const objectsToUpdate = [];
 
 // Presents
 const presentGeometry = new THREE.BoxGeometry(1, 1, 1);
-
 const addPresents = (width, height, depth, position) => {
 	const texture = textures[Math.floor(Math.random() * textures.length)];
 	const presentMaterial = new THREE.MeshStandardMaterial({
 		map: texture,
 		bumpScale: 0.5,
-		// color: "#eeC31B",
 		metalness: 0.3,
-		// roughness: 0.4,
-		// envMap: environmentMapTexture,
-		// envMapIntensity: 0.5,
 	});
-	// Three mesh
 	const mesh = new THREE.Mesh(presentGeometry, presentMaterial);
 	mesh.scale.set(width, height, depth);
 	mesh.castShadow = true;
@@ -249,6 +225,7 @@ addPresents(1, 1.5, 2, {
 /**
  * Snow
  */
+
 // Geometry
 const snowGeometry = new THREE.BufferGeometry();
 const snowCount = 30000;
@@ -274,13 +251,9 @@ scene.add(snow);
  * Floor
  */
 const floor = new THREE.Mesh(
-	new THREE.PlaneGeometry(10, 10),
+	new THREE.PlaneGeometry(20, 20),
 	new THREE.MeshStandardMaterial({
 		map: snowTexture,
-		// metalness: 0.3,
-		// roughness: 0.4,
-		// envMap: environmentMapTexture,
-		// envMapIntensity: 0.5,
 	})
 );
 floor.receiveShadow = true;
@@ -368,10 +341,10 @@ const tick = () => {
 	const deltaTime = elapsedTime - oldElapsedTime;
 	oldElapsedTime = elapsedTime;
 
-	// snow.position.y -= deltaTime * 0.1;
 	const positions = snowGeometry.attributes.position.array;
 	for (let i = 0; i < snowCount; i += 3) {
 		positions[i + 1] -= deltaTime * 0.1;
+		// Wind effect
 		positions[i] += Math.sin(elapsedTime * 0.1 + i) * 0.2 * deltaTime;
 		if (positions[i + 1] < -5) {
 			positions[i + 1] = 5;
