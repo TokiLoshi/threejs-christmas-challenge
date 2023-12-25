@@ -8,13 +8,15 @@ import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader";
 /**
  * Debug Controls
  */
-
 const gui = new GUI();
 const debugObject = {};
 
 /** Debugging */
 
+const addSound = new Audio("/sounds/adding.mp3");
+const cleanUpSound = new Audio("/sounds/cleanup.mp3");
 // Add Presents
+console.log(addSound);
 debugObject.addPresents = () => {
 	console.log("Time to add some presents");
 	addPresents(Math.random(), Math.random(), Math.random(), {
@@ -23,6 +25,8 @@ debugObject.addPresents = () => {
 		z: (Math.random() - 0.5) * 3,
 	});
 	console.log("Adding Presents");
+	addSound.currentTime = 0;
+	addSound.play();
 };
 gui.add(debugObject, "addPresents");
 
@@ -34,6 +38,7 @@ debugObject.cleanUp = () => {
 		scene.remove(object.mesh);
 	}
 	objectsToUpdate.splice(0, objectsToUpdate.length);
+	cleanUpSound.play();
 };
 gui.add(debugObject, "cleanUp");
 
@@ -95,7 +100,7 @@ loader.load(
 	"models/snowman1.glb",
 	(gltf) => {
 		// gltf.scene.scale.set(20, 20, 20);
-		console.log(gltf);
+		// console.log(gltf);
 		gltf.scene.position.y = -0.3;
 		gltf.scene.position.x = -1;
 		gltf.scene.rotation.y = Math.PI * 0.45;
@@ -105,7 +110,7 @@ loader.load(
 				child.castShadow = true;
 				child.receiveShadow = true;
 				child.geometry.computeBoundingSphere();
-				console.log(child.name, child.geometry.boundingSphere);
+				// console.log(child.name, child.geometry.boundingSphere);
 			}
 		});
 		scene.add(gltf.scene);
@@ -133,51 +138,24 @@ const defaultContactMaterial = new CANNON.ContactMaterial(
 	defaultMaterial,
 	{
 		friction: 1,
-		restitution: 0.7,
+		restitution: 0.3,
 	}
 );
 
 world.addContactMaterial(defaultContactMaterial);
 
+// Floor
 const floorShape = new CANNON.Plane();
-const floorBody = new CANNON.Body();
-floorBody.mass = 0;
-floorBody.addShape(floorShape);
+const floorBody = new CANNON.Body({
+	mass: 0,
+	shape: floorShape,
+	material: defaultMaterial,
+});
 floorBody.quaternion.setFromAxisAngle(new CANNON.Vec3(-1, 0, 0), Math.PI * 0.5);
+floorBody.position.set(0, 0.1, 0);
 world.addBody(floorBody);
 
-// const bottomRadius = 1.5;
-// const middleRadius = 1.4;
-// const topRadius = 1.5;
-// const posYBottom = 0;
-// const posYMiddle = 1.5;
-// const posYTop = 3;
-
-// const bottomSphereShape = new CANNON.Sphere(bottomRadius);
-// const middleSphereShape = new CANNON.Sphere(middleRadius);
-// const headSphere = new CANNON.Sphere(topRadius);
-
-// const snowmanBody = new CANNON.Body({ mass: 0, material: defaultMaterial });
-// snowmanBody.addShape(bottomSphereShape, new CANNON.Vec3(0, posYBottom, 0));
-// snowmanBody.addShape(middleSphereShape, new CANNON.Vec3(0, posYMiddle, 0));
-// snowmanBody.addShape(headSphere, new CANNON.Vec3(0, posYTop, 0));
-// const snowmanPosition = {
-// 	x: -1,
-// 	y: -0.3,
-// 	z: 0,
-// };
-// const bottomSphereShape = new CANNON.Sphere(1.9242523951366333); // Use the largest radius
-// const bottomSphereBody = new CANNON.Body({
-// 	mass: 0, // Make it static if the snowman won't move
-// 	position: new CANNON.Vec3(
-// 		snowmanPosition.x + 0.002950906753540039,
-// 		snowmanPosition.y - 0.5406738519668579,
-// 		snowmanPosition.z - 0.004921019077301025
-// 	),
-// });
-// world.addBody(bottomSphereBody);
-// world.addBody(snowmanBody);
-// The snowman's position in the world
+// Snowman
 const snowmanPosition = new CANNON.Vec3(-1, -0.3, 0);
 
 // Create the spheres based on the provided diameters (divide by 2 for radius)
@@ -189,38 +167,31 @@ const topRadius = 1.15 / 2;
 const bottomSphereShape = new CANNON.Sphere(bottomRadius);
 const middleSphereShape = new CANNON.Sphere(middleRadius);
 const topSphereShape = new CANNON.Sphere(topRadius);
-
-// Create a compound body for the snowman
-const snowmanBody = new CANNON.Body({ mass: 0 }); // Static body
+const snowmanBody = new CANNON.Body({ mass: 0 });
 
 // Calculate the position of the bottom sphere (touching the ground)
 const bottomSpherePos = new CANNON.Vec3(
 	snowmanPosition.x,
-	snowmanPosition.y + bottomRadius, // Bottom sphere is half above ground level
+	snowmanPosition.y + bottomRadius,
 	snowmanPosition.z
 );
 
-// Calculate the vertical offset for the middle and top spheres
-// Middle sphere is on top of the bottom sphere, so its position is bottom position + 2 radii
 const middleSpherePos = new CANNON.Vec3(
 	snowmanPosition.x,
 	bottomSpherePos.y + bottomRadius + middleRadius,
 	snowmanPosition.z
 );
 
-// Top sphere is on top of the middle sphere, similar calculation
 const topSpherePos = new CANNON.Vec3(
 	snowmanPosition.x,
 	middleSpherePos.y + middleRadius + topRadius,
 	snowmanPosition.z
 );
 
-// Add the shapes to the snowman body at the calculated positions
+// Add the shapes to the snowman body
 snowmanBody.addShape(bottomSphereShape, bottomSpherePos);
 snowmanBody.addShape(middleSphereShape, middleSpherePos);
 snowmanBody.addShape(topSphereShape, topSpherePos);
-
-// Add the snowman body to the world
 world.addBody(snowmanBody);
 
 /**
@@ -233,15 +204,14 @@ const presentGeometry = new THREE.BoxGeometry(1, 1, 1);
 
 const addPresents = (width, height, depth, position) => {
 	const texture = textures[Math.floor(Math.random() * textures.length)];
-	console.log(`New texture to add: ${texture}`);
 	const presentMaterial = new THREE.MeshStandardMaterial({
 		map: texture,
 		bumpScale: 0.5,
 		// color: "#eeC31B",
-		// metalness: 0.3,
-		roughness: 0.4,
-		envMap: environmentMapTexture,
-		envMapIntensity: 0.5,
+		metalness: 0.3,
+		// roughness: 0.4,
+		// envMap: environmentMapTexture,
+		// envMapIntensity: 0.5,
 	});
 	// Three mesh
 	const mesh = new THREE.Mesh(presentGeometry, presentMaterial);
@@ -262,7 +232,6 @@ const addPresents = (width, height, depth, position) => {
 		material: defaultMaterial,
 	});
 	body.position.copy(position);
-
 	world.addBody(body);
 	objectsToUpdate.push({ mesh, body });
 };
@@ -270,7 +239,7 @@ const addPresents = (width, height, depth, position) => {
 addPresents(1, 1.5, 2, {
 	x: 0.1,
 	y: 3,
-	z: 0,
+	z: 0.01,
 });
 
 /**
