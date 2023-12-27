@@ -19,7 +19,6 @@ const addSound = new Audio("/sounds/adding.mp3");
 const cleanUpSound = new Audio("/sounds/cleanup.mp3");
 
 // Add Presents
-console.log(addSound);
 debugObject.addPresents = () => {
 	addPresents(Math.random(), Math.random(), Math.random(), {
 		x: (Math.random() - 0.5) * 3,
@@ -39,7 +38,6 @@ debugObject.cleanUp = () => {
 		scene.remove(object.mesh);
 	}
 	objectsToUpdate.splice(0, objectsToUpdate.length);
-	console.log(cleanUpSound);
 	cleanUpSound.play().volume = 0.2;
 };
 gui.add(debugObject, "cleanUp");
@@ -65,21 +63,21 @@ const textureLoader = new THREE.TextureLoader();
 const cubeTextureLoader = new THREE.CubeTextureLoader();
 
 const textures = [
-	textureLoader.load("/textures/2.png"),
-	textureLoader.load("/textures/2.png"),
-	textureLoader.load("/textures/3.png"),
-	textureLoader.load("/textures/4.png"),
-	textureLoader.load("/textures/5.png"),
-	textureLoader.load("/textures/6.png"),
-	textureLoader.load("/textures/7.png"),
-	textureLoader.load("/textures/8.png"),
-	textureLoader.load("/textures/9.png"),
-	textureLoader.load("/textures/10.png"),
-	textureLoader.load("/textures/11.png"),
-	textureLoader.load("/textures/12.png"),
-	textureLoader.load("/textures/13.png"),
-	textureLoader.load("/textures/14.png"),
-	textureLoader.load("/textures/15.png"),
+	textureLoader.load("/textures/2.jpg"),
+	textureLoader.load("/textures/2.jpg"),
+	textureLoader.load("/textures/3.jpg"),
+	textureLoader.load("/textures/4.jpg"),
+	textureLoader.load("/textures/5.jpg"),
+	textureLoader.load("/textures/6.jpg"),
+	textureLoader.load("/textures/7.jpg"),
+	textureLoader.load("/textures/8.jpg"),
+	textureLoader.load("/textures/9.jpg"),
+	textureLoader.load("/textures/10.jpg"),
+	textureLoader.load("/textures/11.jpg"),
+	textureLoader.load("/textures/12.jpg"),
+	textureLoader.load("/textures/13.jpg"),
+	textureLoader.load("/textures/14.jpg"),
+	textureLoader.load("/textures/15.jpg"),
 ];
 const snowTexture = textureLoader.load("/textures/16.jpg");
 
@@ -251,7 +249,7 @@ scene.add(snow);
  * Floor
  */
 const floor = new THREE.Mesh(
-	new THREE.PlaneGeometry(20, 20),
+	new THREE.PlaneGeometry(10, 10),
 	new THREE.MeshStandardMaterial({
 		map: snowTexture,
 	})
