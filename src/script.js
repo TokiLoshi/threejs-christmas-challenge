@@ -81,7 +81,7 @@ const textures = [
 	textureLoader.load("/textures/14.png"),
 	textureLoader.load("/textures/15.png"),
 ];
-const snowTexture = textureLoader.load("/textures/16.png");
+const snowTexture = textureLoader.load("/textures/16.jpg");
 
 /**
  * Models
